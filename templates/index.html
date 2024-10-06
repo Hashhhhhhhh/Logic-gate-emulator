@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Logic Gate Emulator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&display=swap');
+
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        .welcome-box {
+            background-color: black;
+            padding: 20px;
+            text-align: center;
+            width: 60%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .welcome-box img {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 80px; /* Adjust size as needed */
+            height: auto;
+        }
+
+        .welcome-box h2 {
+            font-family: 'Pacifico', cursive;
+            color: white;
+            margin: 0;
+            font-size: 32px;
+            padding-left: 90px; /* Adjust padding to make space for the frog image */
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            text-align: center;
+            width: 80%;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            color: black;
+        }
+
+        .gate-buttons {
+            margin-top: 20px;
+        }
+
+        .gate-buttons h3 {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .gate-buttons button {
+            margin: 5px;
+            padding: 10px 15px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #ffcccb; /* Light pink background */
+            border: 2px solid #ff69b4; /* Hot pink border */
+            border-radius: 8px;
+            color: #333; /* Dark text */
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .gate-buttons button:hover {
+            background-color: #ff69b4; /* Hot pink background on hover */
+            border-color: #ffcccb; /* Light pink border on hover */
+            color: white; /* White text on hover */
+        }
+
+        .simulate-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #ffcccb;
+            border: 2px solid #ff69b4;
+            border-radius: 8px;
+            color: #333;
+            transition: background-color 0.3s, border-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .simulate-button:hover {
+            background-color: #ff69b4;
+            border-color: #ffcccb;
+            color: white;
+        }
+
+        .reset-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #ffcccb;
+            border: 2px solid #ff69b4;
+            border-radius: 8px;
+            color: #333;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .reset-button:hover {
+            background-color: #ff69b4;
+            border-color: #ffcccb;
+            color: white;
+        }
+
+        #visualization {
+            margin-top: 20px;
+            display: none; /* Hidden by default, shown after simulation */
+        }
+
+        #visualization img {
+            max-width: 100%; /* Ensure the image fits within the container */
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid #ff69b4; /* Hot pink border */
+            margin-bottom: 20px;
+        }
+
+        #circuitDiagram {
+            margin-top: 20px;
+            display: none; /* Hidden by default, shown after simulation */
+        }
+
+        #circuitDiagram img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid #ff69b4;
+        }
+
+        #circuitDesc {
+            font-family: 'Hachi Maru Pop', cursive;
+            font-size: 20px; /* Adjust font size as needed */
+            color: #333; /* Darker text for better readability */
+            font-style: normal;
+            padding: 15px;
+            border: 2px solid #ff69b4; /* Hot pink border */
+            border-radius: 8px;
+            background-color: #ffe6f0; /* Light pink background */
+            min-height: 50px;
+            word-wrap: break-word;
+            display: inline-block; /* Allows margin auto to work */
+            max-width: 80%; /* Prevents the box from being too wide */
+            margin: 0 auto; /* Centers the circuitDesc box within its parent */
+            text-align: center; /* Center the text inside the box */
+            resize: vertical; /* Allow vertical resizing */
+            overflow: auto; /* Enable scroll if content overflows */
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-box">
+        <img src="{{ url_for('static', filename='images/frog.jpg') }}" alt="Frog Logo">
+        <h2>Welcome to the quantum world!</h2>
+    </div>
+    <div class="container">
+        <h1>Quantum Logic Gate Emulator</h1>
+        <div class="gate-buttons">
+            <h3>Experiment with the single-qubit gates given below and become quantum-fied!</h3>
+            <button onclick="addGate('H')">Hadamard (H)</button>
+            <button onclick="addGate('X')">Pauli-X (X)</button>
+            <button onclick="addGate('Y')">Pauli-Y (Y)</button>
+            <button onclick="addGate('Z')">Pauli-Z (Z)</button>
+            <button onclick="addGate('CX')">CNOT (CX)</button>
+            <button onclick="addGate('S')">Phase (S)</button>
+            <button onclick="addGate('T')">T</button>
+            <button onclick="addGate('SWAP')">SWAP</button>
+            <button onclick="addRotationGate('RX')">RX</button>
+            <button onclick="addRotationGate('RY')">RY</button>
+            <button onclick="addRotationGate('RZ')">RZ</button>
+        </div>
+        <textarea id="circuitDesc" placeholder="Quantum Circuit" title="You can manually edit the circuit here or use the buttons above to add gates."></textarea>
+        <button class="simulate-button" onclick="simulate()">
+            Simulate
+            <span class="cute-text">✨</span>
+        </button>
+        <button class="reset-button" onclick="resetCircuit()">Reset Circuit</button>
+        <div id="visualization">
+            <h2>Quantum State Visualization:</h2>
+            <img id="visualizationImg" src="" alt="Quantum State Visualization">
+        </div>
+        <div id="circuitDiagram">
+            <h2>Quantum Circuit Diagram:</h2>
+            <img id="circuitDiagramImg" src="" alt="Quantum Circuit Diagram">
+        </div>
+    </div>
+    <script>
+        let circuit = [];
+
+        function addGate(gate) {
+            circuit.push(gate);
+            updateCircuitDesc();
+        }
+
+        function addRotationGate(gate) {
+            let angle = prompt(`Enter the rotation angle for ${gate} (in radians):`);
+            if (angle) {
+                if (isNaN(angle)) {
+                    alert('Invalid angle. Please enter a numerical value.');
+                    return;
+                }
+                circuit.push(`${gate}${angle}`);
+                updateCircuitDesc();
+            }
+        }
+
+        function updateCircuitDesc() {
+            document.getElementById("circuitDesc").value = circuit.join(" ");
+        }
+
+        function simulate() {
+            const circuitDesc = document.getElementById("circuitDesc").value.trim();
+
+            if (circuitDesc.length === 0) {
+                alert('Please add at least one gate to simulate.');
+                return;
+            }
+
+            fetch('/simulate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ circuit: circuitDesc }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(`Error: ${data.error}\nDetails: ${data.details}`);
+                    return;
+                }
+
+                // Display the quantum state visualization image
+                document.getElementById("visualizationImg").src = `data:image/png;base64,${data.image}`;
+                document.getElementById("visualization").style.display = 'block';
+
+                // If you want to show a circuit diagram or any other details, add those here
+                // Example: document.getElementById("circuitDiagramImg").src = `data:image/png;base64,${data.circuitDiagram}`;
+                // document.getElementById("circuitDiagram").style.display = 'block';
+
+                // Clear the circuit for the next simulation
+                circuit = [];
+                updateCircuitDesc();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function resetCircuit() {
+            circuit = [];
+            updateCircuitDesc();
+            document.getElementById("visualization").style.display = 'none';
+            document.getElementById("circuitDiagram").style.display = 'none';
+        }
+    </script>
+</body>
+</html>
